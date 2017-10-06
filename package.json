@@ -1,0 +1,23 @@
+{
+  "name": "checklistapp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "checklist",
+    "cleanroom"
+  ],
+  "author": "Michael Fang",
+  "license": "ISC",
+  "dependencies": {
+    "ejs": "^2.5.7",
+    "express": "^4.16.1",
+    "express-json-validator": "^1.0.1",
+    "express-validator": "^4.2.1",
+    "google-auth-library": "^0.11.0",
+    "google-spreadsheet": "^2.0.4"
+  }
+}

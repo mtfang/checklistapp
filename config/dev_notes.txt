@@ -1,0 +1,5 @@
+ngrok.io - allows setup of a temporary website to develop web applications, allows user to look at requests send to this website
+nodemon - npm package that allows update of new changes in code without restarting server
+
+to launch app:
+open shell in app folder and run `nodemon` or less preferablly `node <app>`

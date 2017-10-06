@@ -1,0 +1,232 @@
+{
+    "Form": {
+        "Id": "1",
+        "InternalName": "CleanroomChecklist",
+        "Name": "Cleanroom Checklist"
+    },
+    "$version": 6,
+    "$etag": "W/\"datetime'2017-10-04T06%3A10%3A04.3851858Z'\"",
+    "Entry": {
+        "AdminLink": "https://www.cognitoforms.com/PainterLab1/1/entries/29",
+        "DateCreated": "2017-10-04T06:10:04.395Z",
+        "DateSubmitted": "2017-10-04T06:10:04.395Z",
+        "DateUpdated": "2017-10-04T06:10:04.395Z",
+        "EditLink": "https://www.cognitoforms.com/PainterLab1/CleanroomChecklist#lUsg7TGl67uP5W3Zla-prcde7RIy-TA0UczT1eYCixk$*",
+        "LastPageViewed": null,
+        "Number": 29,
+        "Order": null,
+        "Origin": {
+            "City": null,
+            "CountryCode": null,
+            "IpAddress": "24.205.82.84",
+            "IsImported": false,
+            "Region": null,
+            "Timezone": null,
+            "UserAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.38 Safari/537.36"
+        },
+        "PaymentToken": null,
+        "Status": "Submitted",
+        "Timestamp": "2017-10-04T06:10:04.395Z",
+        "ViewLink": "https://www.cognitoforms.com/PainterLab1/CleanroomChecklist#56bm_xiw0GfO_O8tqxp84wEt2qrS1gDyGPjSm-0VE6M$*"
+    },
+    "Id": "1-29",
+    "GowningArea": {
+        "GowningAreaPressurePositiveToTheHallway": true,
+        "TackyMatsAcceptable": true,
+        "GeneralCleanliness": true,
+        "Notes": null,
+        "Stock": {
+            "BootCovers": null,
+            "MediumNitrileGloves": null,
+            "BeardCovers": null,
+            "Hairnets": null
+        }
+    },
+    "ServiceChase": {
+        "PressureGauges": {
+            "LithoRoomToMainRoom015InchesOfH20": null,
+            "MainCleanroomToGownup005InchesOfH20": null
+        },
+        "BettatechWaterLevelAboveElbow": true,
+        "GasSensorStatus": {
+            "SiH4": "0.0",
+            "NH3": "0.0",
+            "Cl2": "0.0"
+        },
+        "LoadlockChamberPumpRunning": true,
+        "EtchChamberPumpOilLevelAtLine": true,
+        "DepositionChamberPumpOilLevelAtLine": true,
+        "HFVaporPumpgreenLights": true,
+        "CryocompressorgreenLights": true,
+        "ChilledH20": {
+            "ICPRIE3Gpm": null,
+            "PECVD38Gpm": null,
+            "UEtchHFPump1Gpm": null,
+            "Ebeam3Gpm": null,
+            "Room3045Gpm": null
+        },
+        "GeneralCleanliness": true,
+        "Notes": null
+    },
+    "UserInfo": {
+        "Initials": "MF"
+    },
+    "GasBottlePressures": {
+        "C4F8Delivery": null,
+        "C4F8Bottle": null,
+        "H2Delivery": null,
+        "ArDelivery": null,
+        "O2Delivery": null,
+        "N2Delivery": null,
+        "SF6Delivery": null,
+        "HeDelivery": null,
+        "CF4Delivery": null,
+        "N2ODelivery": null,
+        "N2Delivery2": null,
+        "H2Bottle": null,
+        "ArBottle": null,
+        "O2Bottle": null,
+        "N2Bottle": null,
+        "SF6Bottle": null,
+        "HeBottle": null,
+        "CF4Bottle": null,
+        "N2OBottle": null,
+        "N2Bottle2": null,
+        "Notes": null
+    },
+    "GasCabinet": {
+        "PurgeFlow5Scfh": null,
+        "Pressure40Psi": null,
+        "GasBottlePressures": {
+            "Cl2Delivery": null,
+            "Cl2Bottle": null,
+            "NH3Delivery": null,
+            "SiH4Delivery": null,
+            "NH3Bottle": null,
+            "SiH4Bottle": null
+        }
+    },
+    "Cleanroom": {
+        "CoolingFlows": {
+            "EtchAMUICPCoolingFlow045Gpm": null,
+            "EtchRFGENICPCoolingFlow20Gpm": null,
+            "LLTurboCoolingFlow06Gpm": null,
+            "EtchTurboCoolingFlowtrickle": true
+        },
+        "OxfordN2PurgePressure40Psi": null,
+        "GasSensorStatus": {
+            "SiH4": "0.0",
+            "NH3": "0.0",
+            "Cl2": "0.0"
+        },
+        "HFGasSensorStatus": {
+            "H2": "0.0",
+            "HF": "0.0"
+        },
+        "CoolingFlowscont": {
+            "PECVDLFGenCoolingFlow3Gpm": null,
+            "PECVDLWRElectrodeCoolingFlow045Gpm": null,
+            "EbeamCoolingFlow05Gpm": null
+        },
+        "HFCompressedAirPressure70Psi": null,
+        "OxfordCompressedAirPressure95Psi": null,
+        "GeneralCleanliness": true,
+        "Section": {
+            "DryboxFlow5Cfh": null,
+            "DryboxTemperature23C": null
+        }
+    },
+    "Oxford": {
+        "OxfordSoftwareFreeOfErrors": true,
+        "ChamberPressures": {
+            "Etch": null,
+            "LoadLock": null,
+            "PECVD": null
+        },
+        "EtchChamber": {
+            "EtchTableTemperature37C": null,
+            "EtchChamberTurboSpeed345kRPM": null,
+            "EtchChamberTurboTemp61C": null,
+            "EtchChamberControllerTemp31C": null,
+            "EtchChamberTurboCurrent105A": null
+        },
+        "LoadLock": {
+            "LLChanberTurboSpeed27kRPM": null,
+            "LLChamberTurboTemp19C": null,
+            "LLChamberControllerTemp31C": null,
+            "LLChamberTurboCurrent032A": null
+        },
+        "PECVDTableTemperature350C": null,
+        "Notes": null
+    },
+    "SecurityKey": "CbMj23",
+    "EBeamEvaporator": {
+        "EbeamPressure2E7Torr": null,
+        "Notes": null
+    },
+    "UETCHHFVapor": {
+        "UEtchSoftwareFreeOfErrors": true,
+        "UEtchN2Pressure4Psi2": null,
+        "SystemVacuumPressure98Kpa": null,
+        "ChamberVacuumPressure6Torr": null,
+        "HFStickVacuumPressure35Kpa": null,
+        "Notes": null
+    },
+    "TubeFurance": {
+        "TubeFurnaceTemperature150C": null
+    },
+    "YellowRoom": {
+        "EpurResistivity182MOhmcm": null,
+        "FumehoodIntakeRunning": true,
+        "HotPlatesOff": true,
+        "GeneralCleanliness": true,
+        "Notes": null
+    },
+    "SEM": {
+        "Section": {
+            "SEMFlashed": false,
+            "FlashingVoltage15KV": null,
+            "FlashingLevel": null,
+            "FlashingExtractionCurrentIe": null,
+            "SEMFilled": false,
+            "LN2DewarLevel": null
+        },
+        "Section2": {
+            "SCVacuum": null,
+            "SECVacuum": null,
+            "IP1Vacuum": null,
+            "IP2Vacuum": null,
+            "IP3Vacuum2": null
+        },
+        "Notes": null
+    },
+    "TutorialMode": false,
+    "CzarOnlyChecklistItems": false,
+    "SEMChase": {
+        "HaskrisChiller": {
+            "Temperature": null,
+            "Flow": null
+        },
+        "SEMAirCompressor60Psi": null,
+        "PumpOilLevelsOk": true,
+        "GeneralCleanliness": true,
+        "Notes": null
+    },
+    "MechanicalRoom": {
+        "NeslabChiller1": {
+            "On": false,
+            "Full": false,
+            "Temperature19C": null
+        },
+        "NeslabChiller2": {
+            "On": false,
+            "Full": false,
+            "Temperature19C": null
+        },
+        "Notes": null
+    },
+    "PMS": {
+        "CheckMakeupFanfiltersIfCleanroomPressurePoor": false,
+        "Notes": null
+    }
+}
