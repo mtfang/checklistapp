@@ -1,16 +1,15 @@
 <% include partials/header %>
+<%if (message != "" && message != null) {%>
+    <div class="alert alert-danger">
+        <h2>"<%= message %>" - <%= user %></h2>
+    </div>
+<% } %>
 <br>
 <div class="container">
   <div class="jumbotron">
     <h2><%= title %></h2>
     <h2><strong><%= date %></strong></h2>
     <h2><strong><%= time %></strong></h2>
-    <br>
-    <%if (message != "") {%>
-        <div class="alert alert-danger">
-            <h2>"<%= message %>" - <%= user %></h2>
-        </div>
-    <% } %>
   </div>
   <div class="alert alert-info">
     <h2><strong><a href="https://www.cognitoforms.com/PainterLab1/CleanroomChecklist" class="alert-link">SUBMIT A CHECKLIST</a></strong></h2>

@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 //require the path nodejs module
 const path = require("path");
 //define port number
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 //require filesystem
 const fs = require('fs');
 //require readline
@@ -107,7 +107,7 @@ function loadSheetInfo(content){
     var sheetLabels = parsed.sheetLabels;
     var lastUser = parsed.lastUser;
     var publicMessage = parsed.publicMessage;
-    console.log('>>> Sheet properties loaded')
+    // console.log('>>> Sheet properties loaded')
     return [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage]
 }
 
@@ -138,13 +138,14 @@ function updateSubmitDate(res, req){
             return;
         } else {
             // console.log('Sheet info read');
-            var lastSubmit = loadSheetInfo(sheetcontent)[0];
-            var spreadsheetId = loadSheetInfo(sheetcontent)[1];
-            var sheetName = loadSheetInfo(sheetcontent)[2];
-            var sheetLabels = loadSheetInfo(sheetcontent)[3];
-            var lastUser = loadSheetInfo(sheetcontent)[4];
-            var publicMessage = loadSheetInfo(sheetcontent)[5];
-            // [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = loadSheetInfo(sheetcontent);
+            // var lastSubmit = loadSheetInfo(sheetcontent)[0];
+            // var spreadsheetId = loadSheetInfo(sheetcontent)[1];
+            // var sheetName = loadSheetInfo(sheetcontent)[2];
+            // var sheetLabels = loadSheetInfo(sheetcontent)[3];
+            // var lastUser = loadSheetInfo(sheetcontent)[4];
+            // var publicMessage = loadSheetInfo(sheetcontent)[5];
+            [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = loadSheetInfo(sheetcontent);
+            // console.log(publicMessage)
             var date = new Date(lastSubmit)
             var date_options = {
                 weekday: 'long',
@@ -214,13 +215,13 @@ function readClientInfo(callback, sheetInfo, data){
 // Check sheet labels, if different than current sheet,
 // make new sheet, and add entries of data to sheet
 function checkSheet(auth, sheetInfo, data){
-    var lastSubmit = sheetInfo[0];
-    var spreadsheetId = sheetInfo[1];
-    var sheetName = sheetInfo[2];
-    var sheetLabels = sheetInfo[3];
-    var lastUser = sheetInfo[4];
-    var publicMessage = sheetInfo[5];
-    // var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
+    // var lastSubmit = sheetInfo[0];
+    // var spreadsheetId = sheetInfo[1];
+    // var sheetName = sheetInfo[2];
+    // var sheetLabels = sheetInfo[3];
+    // var lastUser = sheetInfo[4];
+    // var publicMessage = sheetInfo[5];
+    var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
     // Read first line of sheet
     var sheets = google.sheets('v4');
     sheets.spreadsheets.values.get({
@@ -266,13 +267,13 @@ function sendDataAndUpdateSheet(data, sheetInfo, amountOfData){
 
  //STEP 4.5
 function batchUpdateNewSheet(auth, sheetInfo, data){
-    var lastSubmit = sheetInfo[0];
-    var spreadsheetId = sheetInfo[1];
-    var sheetName = sheetInfo[2];
-    var sheetLabels = sheetInfo[3];
-    var lastUser = sheetInfo[4];
-    var publicMessage = sheetInfo[5];
-    // var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
+    // var lastSubmit = sheetInfo[0];
+    // var spreadsheetId = sheetInfo[1];
+    // var sheetName = sheetInfo[2];
+    // var sheetLabels = sheetInfo[3];
+    // var lastUser = sheetInfo[4];
+    // var publicMessage = sheetInfo[5];
+    var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
     // Create ID based on date and time
     var date_string = getFormattedDate(new Date())
     var title = 'EntryStart' + date_string
@@ -313,17 +314,16 @@ function batchUpdateNewSheet(auth, sheetInfo, data){
         }
     });
 }
-
 //STEP 5
 // Add entries of data to sheet
 function updateSheet(auth, sheetInfo, data){
-    var lastSubmit = sheetInfo[0];
-    var spreadsheetId = sheetInfo[1];
-    var sheetName = sheetInfo[2];
-    var sheetLabels = sheetInfo[3];
-    var lastUser = sheetInfo[4];
-    var publicMessage = sheetInfo[5];
-    // var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
+    // var lastSubmit = sheetInfo[0];
+    // var spreadsheetId = sheetInfo[1];
+    // var sheetName = sheetInfo[2];
+    // var sheetLabels = sheetInfo[3];
+    // var lastUser = sheetInfo[4];
+    // var publicMessage = sheetInfo[5];
+    var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
     var body = {
         values: data
     };
@@ -432,12 +432,27 @@ function get_nested_keys(json, keys, parent_key){
 }
 
 // Homepage
-app.get('/', function (req, res) {
+app.get('/checklist', function (req, res) {
     updateSubmitDate(res, req);
 });
 
+app.get('/', function (req, res) {
+    res.redirect('/checklist');
+});
+
+// Message Page
+app.get('/checklist/message', function (req, res) {
+    res.render('message', {
+        title: 'Last submitted by ' + lastUser + ' on',
+        date: date.toLocaleDateString('en-US', date_options),
+        time:date.toLocaleTimeString('en-US', time_options),
+        message: publicMessage,
+        user: lastUser
+    }); //render
+});
+
 // POST request
-app.post('/', function(req, res){
+app.post('/checklist', function(req, res){
     console.log('Recieved online submission at ' + (new Date()));
         readSheetsInfo(req);
         updateSubmitDate(res, req);
