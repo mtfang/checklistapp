@@ -163,10 +163,14 @@ function updateSubmitDate(res, req){
                 timeZone: 'America/Los_Angeles',
                 hour12: 'true'
             };
+            //}
+            var date_now = new Date(Date.now());
             res.render('index', {
                 title: 'Last submitted by ' + lastUser + ' on',
                 date: date.toLocaleDateString('en-US', date_options),
-                time:date.toLocaleTimeString('en-US', time_options),
+                time: date.toLocaleTimeString('en-US', time_options),
+                datenow: date_now.toLocaleDateString('en-US', date_options),
+                timenow: date_now.toLocaleTimeString('en-US', time_options),
                 message: publicMessage,
                 user: lastUser
             }); //render
@@ -183,7 +187,7 @@ function readSheetsInfo(req){
         } else {
             console.log('Saving sheet step 1/5 - Read sheet configuration file')
             var input = JSON.parse(JSON.stringify(req.body));
-            var nested_keys = get_nested_keys(input, [], '');
+            var nested_keys = get_nested_keys(input, [], '', ['Form', 'Entry', '$version', '$etag', 'Id']);
             var data = [];
             for (k in nested_keys){
                 key = nested_keys[k];
@@ -191,7 +195,7 @@ function readSheetsInfo(req){
                 data.push([sheets_key, eval('input' + key)])
             }
             var sheetInfo = loadSheetInfo(sheetcontent)
-            sheetInfo[4] = input.UserInfo.Initials
+            sheetInfo[4] = input.Login.Initials
             sheetInfo[5] = input.PublicMessage
             readClientInfo(checkSheet, sheetInfo, data)
         } //else
@@ -215,12 +219,6 @@ function readClientInfo(callback, sheetInfo, data){
 // Check sheet labels, if different than current sheet,
 // make new sheet, and add entries of data to sheet
 function checkSheet(auth, sheetInfo, data){
-    // var lastSubmit = sheetInfo[0];
-    // var spreadsheetId = sheetInfo[1];
-    // var sheetName = sheetInfo[2];
-    // var sheetLabels = sheetInfo[3];
-    // var lastUser = sheetInfo[4];
-    // var publicMessage = sheetInfo[5];
     var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
     // Read first line of sheet
     var sheets = google.sheets('v4');
@@ -267,12 +265,6 @@ function sendDataAndUpdateSheet(data, sheetInfo, amountOfData){
 
  //STEP 4.5
 function batchUpdateNewSheet(auth, sheetInfo, data){
-    // var lastSubmit = sheetInfo[0];
-    // var spreadsheetId = sheetInfo[1];
-    // var sheetName = sheetInfo[2];
-    // var sheetLabels = sheetInfo[3];
-    // var lastUser = sheetInfo[4];
-    // var publicMessage = sheetInfo[5];
     var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
     // Create ID based on date and time
     var date_string = getFormattedDate(new Date())
@@ -314,15 +306,10 @@ function batchUpdateNewSheet(auth, sheetInfo, data){
         }
     });
 }
+
 //STEP 5
 // Add entries of data to sheet
 function updateSheet(auth, sheetInfo, data){
-    // var lastSubmit = sheetInfo[0];
-    // var spreadsheetId = sheetInfo[1];
-    // var sheetName = sheetInfo[2];
-    // var sheetLabels = sheetInfo[3];
-    // var lastUser = sheetInfo[4];
-    // var publicMessage = sheetInfo[5];
     var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
     var body = {
         values: data
@@ -342,10 +329,45 @@ function updateSheet(auth, sheetInfo, data){
             console.log('>>> Sheet ranges ' + result.updates.updatedRange + ' updated');
             sheetInfo[0] = new Date();
             saveSheetInfo(sheetInfo)
+            fs.readFile(path.join(__dirname,'config/client_secret.json'), function processClientSecrets(err, clientcontent) {
+                if (err) {
+                    console.log('Error loading client secret file: ' + err);
+                    return;
+                } else {
+                    authorize(JSON.parse(clientcontent), batchUpdateAdjustColumns, sheetInfo, data);
+                }
+            });
         }
     });
 }
 
+//STEP 6
+function batchUpdateAdjustColumns(auth, sheetInfo, data){
+   var [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = sheetInfo
+   var requests = [];
+   requests.push({
+    autoResizeDimensions: {
+      dimensions: {
+        sheetId: sheetName.slice(10),
+        dimension: 'COLUMNS',
+      }
+    }
+   });
+   var batchUpdateRequest = {requests: requests};
+   var sheets = google.sheets('v4');
+   sheets.spreadsheets.batchUpdate({
+       auth: auth,
+       spreadsheetId: spreadsheetId,
+       resource: batchUpdateRequest
+   }, function(err, response) {
+       if(err) {
+         // Handle error
+         console.log(err);
+       } else {
+           console.log('Saving sheet step 6/5 (extra) - Auto-adjusting column widths')
+       }
+   });
+}
 // Transposes an array
 function transpose(a) {
   // Calculate the width and height of the Array
@@ -415,29 +437,30 @@ function storeToken(token) {
     console.log('Token stored to ' + TOKEN_PATH);
 }
 // Looks for all nested keys in a json (does not do json arrays)
-function get_nested_keys(json, keys, parent_key){
+function get_nested_keys(json, keys, parent_key, black_list = []){
     var reached_end = false;
     var full_key = ''
     for(var i in json){
-        var key = i;
-        var val = json[i];
-        if (typeof(val) == 'string' || val == null || typeof(val) == 'boolean' || typeof(val) == 'number'){
-            full_key = parent_key + '.' + key
-            keys.push(full_key);
-        } else {
-            get_nested_keys(val, keys, parent_key + '.' + key)
+        if (!(black_list.includes(i))){
+            var key = i;
+            var val = json[i];
+            if (typeof(val) == 'string' || val == null || typeof(val) == 'boolean' || typeof(val) == 'number'){
+                full_key = parent_key + '.' + key
+                keys.push(full_key);
+            } else {
+                get_nested_keys(val, keys, parent_key + '.' + key)
+            }
         }
     }
     return keys
 }
 
 // Homepage
-app.get('/checklist', function (req, res) {
-    updateSubmitDate(res, req);
-});
-
 app.get('/', function (req, res) {
     res.redirect('/checklist');
+});
+app.get('/checklist', function (req, res) {
+    updateSubmitDate(res, req);
 });
 
 // Message Page
@@ -445,14 +468,24 @@ app.get('/checklist/message', function (req, res) {
     res.render('message', {
         title: 'Last submitted by ' + lastUser + ' on',
         date: date.toLocaleDateString('en-US', date_options),
-        time:date.toLocaleTimeString('en-US', time_options),
+        time: date.toLocaleTimeString('en-US', time_options),
         message: publicMessage,
         user: lastUser
     }); //render
 });
 
+// Redirect Page
+app.get('/checklist/redirect', function (req, res) {
+    res.render('redirect'); //render
+});
+
+// Help Page
+app.get('/checklist/help', function (req, res) {
+    res.render('help'); //render
+});
+
 // POST request
-app.post('/checklist', function(req, res){
+app.post('/checklist/submission', function(req, res){
     console.log('Recieved online submission at ' + (new Date()));
         readSheetsInfo(req);
         updateSubmitDate(res, req);
@@ -476,6 +509,10 @@ app.post('/checklist', function(req, res){
 //         });
 //     };
 // });
+
+app.get('*', function(req, res){
+  res.status(404).render('404page');
+});
 
 app.listen(PORT, function () {
     console.log('Listening on port ' + PORT);

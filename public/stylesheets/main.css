@@ -1,3 +1,9 @@
+.alert-danger{
+    border-radius: 0rem !important;
+    margin-bottom: 0rem !important;
+    border: 0px solid transparent !important;
+    padding: 2rem 1rem !important;
+}
 .jumbotron {
   background: #000000;
   color: white;
@@ -35,3 +41,113 @@
      .jumbotron h2{
          text-align: center;
      }
+
+     .c-forms-heading h2{
+    font-size: 72px !important;
+    color: #000000 !important;
+}
+.cognito .c-label label, .cognito .c-label{
+  color: #000000 !important;
+  font-size: 24px !important;
+}
+.cognito input[type=text], .cognito .c-dropdown{
+    border-width: 3px !important;
+    border-color: #000000 !important;
+    /*border-radius: 8px !important;*/
+    font-size: 16px !important;
+    /*padding: 10px !important;*/
+}
+
+.cognito .c-section{
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    padding: 16px 16px;
+    margin: 0px 0px;
+    box-shadow: inset 0px 0px 4px;
+}
+#c-submit-button {
+  background-color: #1a8e00 !important;
+  border-radius: 10px !important;
+}
+
+.c-page-nav{
+  border-radius: 10px !important;
+}
+.c-yesno-toggle{
+    border-width: 3px !important;
+    border-color: #000000 !important;
+    font-size: 16px !important;
+
+}
+.c-text-singleline .c-text-multiplelines .c-editor{
+  font-size: 16px !important;
+  border-width: 3px !important;
+  border-color: #000000 !important;
+}
+ .cognito button {
+  position: relative;
+  font-size: 40px !important;
+  padding: 32px 32px;
+  align-self: center !important;
+  font-weight: bold;
+
+ }
+ .cognito .c-action{
+    margin: auto !important;
+    float: none !important;
+    padding: 20px 2px;
+ }
+
+ .c-helptext {
+  font-size: 16px !important;
+}
+
+ .c-title > *{
+  font-size: 35px !important;
+  font-weight: bold;
+ }
+
+  .c-validation {
+  font-size: 16px !important;
+  font-weight: bold;
+ }
+
+.c-yesno-checkbox{
+  font-size: 24px !important;
+  font-weight: bold;
+}
+
+.cognito .has-switch{
+    border: 3px solid;
+    border-color: #000000;
+}
+ .cognito .has-switch span.switch-left{
+     color: #ffffff;
+     background-color: #000000;
+     font-size: 16px;
+         background-image: none !important;
+         /*border-color: #fff #fff #fff important!;*/
+ }
+
+ .cognito .has-switch span.switch-right{
+     color: #000000;
+     background-color: #000000;
+     background-color: #000000;
+     font-size: 16px;
+    /*border-color: #fff #fff #fff important!;*/
+ }
+ .cognito .has-switch label{
+     margin-top: 0px !important;
+margin-bottom: 0px !important;
+border-left: 0px solid #000;
+border-right: 0px solid #000;
+    border-bottom: 0px solid #000;
+ }
+.cognito .c-forms-form input[type=text], .cognito .c-forms-form input[type=password], .cognito .c-forms-form textarea, .cognito .c-forms-form select{
+         border: 3px solid !important;
+ }
+
+iframe {
+  display:block;
+  margin: auto; 
+}
