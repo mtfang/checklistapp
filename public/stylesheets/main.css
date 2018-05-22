@@ -151,3 +151,13 @@ iframe {
   display:block;
   margin: auto; 
 }
+
+#message_top_jumbo { background: #dbffd3; 
+color: black;}
+#message_jumbo { background: #dbeffc; color: black;}
+
+#message_container { background: #dbdbdb; color: black;}
+
+input {
+  font-size: 24px;
+}

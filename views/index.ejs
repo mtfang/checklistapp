@@ -1,9 +1,17 @@
 <% include partials/header %>
-<%if (message != "" && message != null) {%>
+<%if (noticeboard.length > 0) {%>
     <div class="alert alert-danger">
-        <h2>"<%= message %>" - <%= user %></h2>
+      <% var last_message = noticeboard[noticeboard.length - 1]; %>
+        <h2>Latest Notice: "<%= last_message.content.text %>" - <%= last_message.content.author %></h2>
     </div>
 <% } %>
+
+<%if (message != "" && message != null) {%>
+    <div class="alert alert-danger">
+        <h2>Checklist Notice"<%= message %>" - <%= user %></h2>
+    </div>
+<% } %>
+
 <br>
 <div class="container">
   <div class="jumbotron">
@@ -14,19 +22,13 @@
   <div class="alert alert-success">
     <h3><strong><u><a href="https://www.cognitoforms.com/forms/paintergroupcleanroomchecklist/entries" target="_blank" class="alert-link">VIEW PREVIOUS SUBMISSIONS</a></u></strong></h3> 
   </div>
-<div class="alert alert-info">
-  <h3><strong><u><a href="http://friday.caltech.edu/checklist/help" class="alert-link">HELP</a></u></strong></h3> </div>
-  <!-- <div align="center">
-      <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vSvhMT_zqwlmo6Z7Wks0W1ZTwPRHexj5nAYyWze5_y_aNVN4ZcH_O2S4bG72siGcy74ZSUrAJnZ11TI/pubhtml?chrome=false&widget=true&amp;headers=false" height=300, width="100%"></iframe>
-  </div> -->
+  <div class="alert alert-info">
+  <h3><strong><u><a href="http://localhost:3001/checklist/noticeboard" class="alert-link">NOTICE BOARD</a></u></strong></h3> </div>
   <div class="alert alert-warning">
     <h3><strong><u><a href="https://docs.google.com/spreadsheets/d/1UA0tkX4SjoLpjYhs73SQ4Sn5-uN3PPQGVE76ogX4umk/edit?usp=sharing" target="_blank" class="alert-link">UETCH USAGE LOG</a></u></strong></h3>
   </div>
     <br>
 </div>
-<!-- <div class="alert alert-info">
-  <h3><strong>SUBMIT A CHECKLIST</strong></h3>
-</div> -->
 <h2 align="center"><strong>SUBMIT A CHECKLIST:<strong></h2>
     <br>
 <div align="center" class="cognito" style="overflow:visible !important">
@@ -39,4 +41,7 @@
     <h3><strong><u><a href="https://docs.google.com/spreadsheets/d/10009Y1R6vAcs7MF2Y1ZQWmickcqyhC04GPd5m0NVXZk/" target="_blank" class="alert-link">PREVIOUS SUBMISSIONS BACKUP</a></u></strong></h3>
   </div>
   </div>
+<!--   <div class="container">
+  <div class="alert alert-info">
+  <h3><strong><u><a href="http://friday.caltech.edu/checklist/help" class="alert-link">HELP</a></u></strong></h3> </div></div> -->
 <% include partials/footer %>

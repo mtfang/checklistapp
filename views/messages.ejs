@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Notice Board</title>
+        
+        <!-- <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /> -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+        <link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script>
+            $(function() {
+                $("#post_button").click(function() {
+                    clickDate = Date.now();
+                    post_message(clickDate);
+                });  
+                get_messages();
+            });
+            
+
+            $(document).on('click', '.delete_button', function(){
+                delete_message(this.id);
+            });
+
+            function get_messages() {
+                $.ajax({
+                    url: "/checklist/noticeboard/messages",
+                    dataType: "json",
+                    success: function (data) {
+                        update_message_list(data);
+                    }
+                });
+            }
+            
+            function post_message(clickDate) {
+                var new_message = $("#post_message").val();
+                var new_author = $("#post_author").val();
+                var curdate = clickDate;
+                $.ajax({
+                    url: "/checklist/noticeboard/messages",
+                    type: "POST",
+                    dataType: "json",
+                    data: { "id": curdate, "text": new_message , "author": new_author, "dateStr": Date(curdate)},
+                    success: function (data) {
+                        get_messages();
+                    }
+                });
+            }
+
+            function delete_message(deleteid) {
+                $.ajax({
+                    url: "/checklist/noticeboard/delete/" + deleteid,
+                    dataType: "json",
+                    success: function (data) {
+                        get_messages();
+                    }
+                });
+            }
+
+            function update_message_list(message_data) {
+                $("#message_list").html("");
+                message_data.reverse();
+                $.each(message_data, function(index, value) {
+                    $("#message_list").append("<div class=\"container\" id = \"message_container\"><div class=\"h3\">\"" + value.content.text + "\" - " + value.content.author + "</div><br><div class=\"h4\">" + "<button class=\"delete_button\" class = \".btn-block\" name=\"delete_button\" id=" + value.id + ">Delete</button>" + "&emsp;"+ value.content.dateStr + "</div></div>" + "<br>");
+                });
+            }
+            function GoBackWithRefresh(event) {
+                if ('referrer' in document) {
+                    window.location = document.referrer;
+                } else {
+                    window.history.back();
+                }
+            }
+        </script>
+    </head>
+    <body>
+        
+
+        <br>
+    <div class="container" id = "top_container" align = "center"><div class="jumbotron" id="message_top_jumbo">
+    <br>
+    <h3><strong><u>Message:</u></strong></h3>
+    <input type="text" name="post_message" id="post_message" size= 80 /> <br>
+    <h3><strong><u>Author:</u></strong></h3>
+    <input type="text" name="post_author" id="post_author" size= 10/>
+    <br><br>
+    <input type="button" name="post_button" id="post_button" value="Post" /> <input type="button" onclick="GoBackWithRefresh()" value="Go Back" />
+    </div> 
+    </div> 
+    <div class="container"><div class="jumbotron" id="message_jumbo">
+    <h2><strong><u>Notices</u></strong></h2>
+    <br>
+    <ul id="message_list"></ul>
+    </div> 
+    </div> 
+    </body>
+</html>

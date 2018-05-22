@@ -5,16 +5,28 @@ const  app = express();
 const bodyParser = require('body-parser');
 //require the path nodejs module
 const path = require("path");
+//require the underscore nodejs module
+var _und = require('underscore');
 //define port number
-const PORT = process.env.PORT || 80;
+const PORT = 3001//process.env.PORT || 80;
 //require filesystem
 const fs = require('fs');
 //require readline
 const readline = require('readline');
+//require compression
+var compression = require('compression');
 //require Google APIs
 const google = require('googleapis');
 //require Google Authentication Library
 const googleAuth = require('google-auth-library');
+
+var allowCrossDomain = function(req, res, next) {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Content-Type');
+
+    next();
+}
 
 // If modifying these scopes, delete your previously saved credentials
 // at <$USERHOME>/.credentials/cleanroom_checklist_tokens.json
@@ -31,7 +43,10 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}))
 // Set static path
 app.use(express.static(path.join(__dirname, 'public')))
-
+app.use(compression())
+// app.use(express.compression());
+// app.use(express.static(__dirname + '/public'));
+app.use(allowCrossDomain);
 /**
 * Create an OAuth2 client with the given credentials, and then execute the
 * given callback function.
@@ -89,6 +104,61 @@ function getNewToken(oauth2Client, callback, sheetInfo, data) {
     });
 }
 
+/////////////////////////////////////////////////////////////////////////////////// HELPER FUNCTIONS
+var cdate = Date.now();
+
+var messages_id = [
+  {id: cdate, content: { text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
+             author: 'Lorem Ipsum',
+             dateStr: Date(cdate),
+    },},];
+
+function get_json_by_id(json_data, idnum) {
+  var filtered = json_data.filter(function(item) { 
+   return item.id == idnum;  
+  });
+}
+
+function get_message_list_id(req, res) {
+  res.json(messages_id);
+}
+
+function get_message_id(req, res) {
+  var filtered = messages_id.filter(function(item) { 
+   return item.id == req.params.id;  
+  });
+  res.json(filtered);
+}
+
+function delete_message_id(req, res) {
+  console.log("deleting id " + req.params.id)
+  var filtered = messages_id.filter(function(item) { 
+   return (req.params.id - item.id) !== 0;  
+  });
+  
+  messages_id = filtered;
+  get_message_list_id(req, res);
+}
+
+function put_message_id(req, res) {
+  // if((messages.length <= req.params.id || req.params.id < 0) &&
+  //     (!req.body.hasOwnProperty('text'))) {
+  //   res.statusCode = 400;
+  //   return res.json({ error: 'Invalid message' });
+  // }  
+
+  messages_id[req.params.id] = { text: req.body.text};
+  get_message_list_id(req, res);
+}
+function post_message_id(req, res) {
+  // if(!req.body.hasOwnProperty('text')) {
+  //   res.statusCode = 400;
+  //   return res.json({ error: 'Invalid message' });
+  // }  
+  messages_id.push( {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr}});
+  get_message_list_id(req, res);
+}
+
 function arraysEqual(a, b) {
     if (a === b) return true;
     if (a == null || b == null) return false;
@@ -111,6 +181,8 @@ function loadSheetInfo(content){
     return [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage]
 }
 
+
+
 function saveSheetInfo(sheetInfo){
     var data = {
         "lastSubmit": sheetInfo[0],
@@ -129,6 +201,7 @@ function saveSheetInfo(sheetInfo){
         } //else
     }); //writeFile
 }
+
 
 // STEP 0
 function updateSubmitDate(res, req){
@@ -172,6 +245,7 @@ function updateSubmitDate(res, req){
                 datenow: date_now.toLocaleDateString('en-US', date_options),
                 timenow: date_now.toLocaleTimeString('en-US', time_options),
                 message: publicMessage,
+                noticeboard: messages_id,
                 user: lastUser
             }); //render
         }
@@ -463,16 +537,10 @@ app.get('/checklist', function (req, res) {
     updateSubmitDate(res, req);
 });
 
-// Message Page
-app.get('/checklist/message', function (req, res) {
-    res.render('message', {
-        title: 'Last submitted by ' + lastUser + ' on',
-        date: date.toLocaleDateString('en-US', date_options),
-        time: date.toLocaleTimeString('en-US', time_options),
-        message: publicMessage,
-        user: lastUser
-    }); //render
-});
+// // Message Board Page
+// app.get('/checklist/noticeboard', function (req, res) {
+//     res.render('messages'); //render
+// });
 
 // Redirect Page
 app.get('/checklist/redirect', function (req, res) {
@@ -491,24 +559,16 @@ app.post('/checklist/submission', function(req, res){
         updateSubmitDate(res, req);
 });
 
-// app.post('/submit', function(req, res){
-//     req.checkBody('json_input', 'Input empty').notEmpty();
-//     var errors = req.validationErrors();
-//     if (errors){
-//         res.render('index', {
-//             title: 'ERROR: Input empty',
-//             details: null
-//         });
-//     } else {
-//         var input = JSON.parse(req.body.json_input);
-//         lastSubmit = new Date();
-//         console.log('JSON submitted at ' + lastSubmit);
-//         res.render('index', {
-//             title: 'Submitted on ' + lastSubmit,
-//             details: JSON.stringify(input)
-//         });
-//     };
-// });
+// Notice Board Page
+app.get('/checklist/noticeboard', function (req, res) {
+    get_message_list_id
+    res.render('messages'); //render
+});
+app.get('/checklist/noticeboard/messages', get_message_list_id);
+app.get('/checklist/noticeboard/delete/:id', delete_message_id);
+app.get('/checklist/noticeboard/messages/:id', get_message_id);
+app.put('/checklist/noticeboard/messages/:id', put_message_id);
+app.post('/checklist/noticeboard/messages', post_message_id);
 
 app.get('*', function(req, res){
   res.status(404).render('404page');
