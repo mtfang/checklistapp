@@ -47,6 +47,9 @@ app.use(compression())
 // app.use(express.compression());
 // app.use(express.static(__dirname + '/public'));
 app.use(allowCrossDomain);
+
+var basicAuth = require('basic-auth-connect');
+app.use(basicAuth('painter', 'group'));
 /**
 * Create an OAuth2 client with the given credentials, and then execute the
 * given callback function.
@@ -107,11 +110,7 @@ function getNewToken(oauth2Client, callback, sheetInfo, data) {
 /////////////////////////////////////////////////////////////////////////////////// HELPER FUNCTIONS
 var cdate = Date.now();
 
-var messages_id = [
-  {id: cdate, content: { text: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit',
-             author: 'Lorem Ipsum',
-             dateStr: Date(cdate),
-    },},];
+var messages_id = [];
 
 function get_json_by_id(json_data, idnum) {
   var filtered = json_data.filter(function(item) { 
