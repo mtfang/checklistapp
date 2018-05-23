@@ -44,12 +44,10 @@ app.use(bodyParser.urlencoded({extended: false}))
 // Set static path
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(compression())
-// app.use(express.compression());
-// app.use(express.static(__dirname + '/public'));
 app.use(allowCrossDomain);
 
-var basicAuth = require('basic-auth-connect');
-app.use(basicAuth('painter', 'group'));
+// var basicAuth = require('basic-auth-connect');
+// app.use(basicAuth('painter', 'group'));
 /**
 * Create an OAuth2 client with the given credentials, and then execute the
 * given callback function.
@@ -551,12 +549,6 @@ app.get('/checklist/help', function (req, res) {
     res.render('help'); //render
 });
 
-// POST request
-app.post('/checklist/submission', function(req, res){
-    console.log('Recieved online submission at ' + (new Date()));
-        readSheetsInfo(req);
-        updateSubmitDate(res, req);
-});
 
 // Notice Board Page
 app.get('/checklist/noticeboard', function (req, res) {
@@ -567,11 +559,21 @@ app.get('/checklist/noticeboard/messages', get_message_list_id);
 app.get('/checklist/noticeboard/delete/:id', delete_message_id);
 app.get('/checklist/noticeboard/messages/:id', get_message_id);
 app.put('/checklist/noticeboard/messages/:id', put_message_id);
+
+
+// POST request
+app.post('/checklist/submission', function(req, res){
+    console.log('Recieved online submission at ' + (new Date()));
+        readSheetsInfo(req);
+        updateSubmitDate(res, req);
+});
+
+
 app.post('/checklist/noticeboard/messages', post_message_id);
 
-app.get('*', function(req, res){
-  res.status(404).render('404page');
-});
+// app.get('*', function(req, res){
+//   res.status(404).render('404page');
+// });
 
 app.listen(PORT, function () {
     console.log('Listening on port ' + PORT);
