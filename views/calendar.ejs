@@ -22,11 +22,12 @@
 
 			scheduler.config.xml_date="%Y-%m-%d %H:%i";
 			scheduler.init('scheduler_here',new Date(dny,dnm,dnd),"week");
+			// scheduler.init('scheduler_here',new Date(2018,8,5),"month");
 
 			scheduler.templates.xml_date = function(value){ return new Date(value); };
-			scheduler.load("/calendar/data", "json");
+			scheduler.load("/data", "json");
 
-			var dp = new dataProcessor("/calendar/data");
+			var dp = new dataProcessor("/data");
 			dp.init(scheduler);
 			dp.setTransactionMode("POST", false);
 		}

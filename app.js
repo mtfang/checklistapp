@@ -14,23 +14,22 @@ const fs = require('fs');
 //require readline
 const readline = require('readline');
 //require compression
-var compression = require('compression');
+// var compression = require('compression');
 //require Google APIs
 const google = require('googleapis');
 //require Google Authentication Library
 const googleAuth = require('google-auth-library');
 //MongoDB
-var MongoClient = require('mongodb').MongoClient;
 var db = require('mongoskin').db("mongodb://michael:fang@painterchecklist-shard-00-00-ggi7h.gcp.mongodb.net:27017,painterchecklist-shard-00-01-ggi7h.gcp.mongodb.net:27017,painterchecklist-shard-00-02-ggi7h.gcp.mongodb.net:27017/test?ssl=true&replicaSet=PainterChecklist-shard-0&authSource=admin&retryWrites=true", { w: 0});
-    db.bind('event');
+    db.bind('event2');
 
-var allowCrossDomain = function(req, res, next) {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
+// var allowCrossDomain = function(req, res, next) {
+//     res.header('Access-Control-Allow-Origin', '*');
+//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
+//     res.header('Access-Control-Allow-Headers', 'Content-Type');
 
-    next();
-}
+//     next();
+// }
 
 // If modifying these scopes, delete your previously saved credentials
 // at <$USERHOME>/.credentials/cleanroom_checklist_tokens.json
@@ -42,16 +41,14 @@ var TOKEN_PATH = TOKEN_DIR + 'cleanroom_checklist_tokens.json';
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
+
+// Set static path
+app.use(express.static(path.join(__dirname, 'public')))
 // Allows us to easily read the payload from the webhook
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true}))
-// Set static path
-app.use(express.static(path.join(__dirname, 'public')))
-app.use(compression())
-app.use(allowCrossDomain);
+// app.use(compression())
 
-// var basicAuth = require('basic-auth-connect');
-// app.use(basicAuth('painter', 'group'));
 /**
 * Create an OAuth2 client with the given credentials, and then execute the
 * given callback function.
@@ -538,11 +535,6 @@ app.get('/checklist', function (req, res) {
     updateSubmitDate(res, req);
 });
 
-// // Message Board Page
-// app.get('/checklist/noticeboard', function (req, res) {
-//     res.render('messages'); //render
-// });
-
 // Redirect Page
 app.get('/checklist/redirect', function (req, res) {
     res.render('redirect'); //render
@@ -553,10 +545,53 @@ app.get('/checklist/help', function (req, res) {
     res.render('help'); //render
 });
 
-
 // Calendar Page
 app.get('/checklist/calendar', function (req, res) {
     res.render('calendar'); //render
+});
+
+
+app.get('/data', function(req, res){
+    db.event2.find().toArray(function(err, data){
+        //set id property for all records
+        for (var i = 0; i < data.length; i++)
+            data[i].id = data[i]._id;
+        
+        //output response
+        res.send(data);
+    });
+});
+
+
+app.post('/data', function(req, res){
+    var data = req.body;
+    var mode = data["!nativeeditor_status"];
+    var sid = data.id;
+    var tid = sid;
+
+    delete data.id;
+    delete data.gr_id;
+    delete data["!nativeeditor_status"];
+
+
+    function update_response(err, result){
+        if (err)
+            mode = "error";
+        else if (mode == "inserted")
+            tid = data._id;
+
+        res.setHeader("Content-Type","application/json");
+        res.send({action: mode, sid: sid, tid: tid});
+    }
+
+    if (mode == "updated")
+        db.event2.updateById( sid, data, update_response);
+    else if (mode == "inserted")
+        db.event2.insert(data, update_response);
+    else if (mode == "deleted")
+        db.event2.removeById( sid, update_response);
+    else
+        res.send("Not supported operation");
 });
 
 // POST request
@@ -585,55 +620,9 @@ app.post('/checklist/submission', function(req, res){
 });
 
 
-<<<<<<< HEAD
-app.get('/calendar/data', function(req, res){
-    db.event.find().toArray(function(err, data){
-        //set id property for all records
-        for (var i = 0; i < data.length; i++)
-            data[i].id = data[i]._id;
-        
-        //output response
-        res.send(data);
-    });
-});
-
-
-app.post('/calendar/data', function(req, res){
-    var data = req.body;
-    var mode = data["!nativeeditor_status"];
-    var sid = data.id;
-    var tid = sid;
-
-    delete data.id;
-    delete data.gr_id;
-    delete data["!nativeeditor_status"];
-
-
-    function update_response(err, result){
-        if (err)
-            mode = "error";
-        else if (mode == "inserted")
-            tid = data._id;
-
-        res.setHeader("Content-Type","application/json");
-        res.send({action: mode, sid: sid, tid: tid});
-    }
-
-    if (mode == "updated")
-        db.event.updateById( sid, data, update_response);
-    else if (mode == "inserted")
-        db.event.insert(data, update_response);
-    else if (mode == "deleted")
-        db.event.removeById( sid, update_response);
-    else
-        res.send("Not supported operation");
-});
 
 app.post('/checklist/noticeboard/messages', post_message_id);
 
-// app.get('*', function(req, res){
-//   res.status(404).render('404page');
-// });
 
 app.listen(PORT, function () {
     console.log('Listening on port ' + PORT);
