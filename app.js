@@ -553,6 +553,7 @@ app.get('/checklist/help', function (req, res) {
     res.render('help'); //render
 });
 
+
 // Calendar Page
 app.get('/checklist/calendar', function (req, res) {
     res.render('calendar'); //render
@@ -574,13 +575,17 @@ app.get('/checklist/noticeboard/messages', get_message_list_id);
 app.get('/checklist/noticeboard/delete/:id', delete_message_id);
 app.get('/checklist/noticeboard/messages/:id', get_message_id);
 app.put('/checklist/noticeboard/messages/:id', put_message_id);
-app.post('/checklist/noticeboard/messages', post_message_id);
 
-app.get('*', function(req, res){
-  res.status(404).render('404page');
+
+// POST request
+app.post('/checklist/submission', function(req, res){
+    console.log('Recieved online submission at ' + (new Date()));
+        readSheetsInfo(req);
+        updateSubmitDate(res, req);
 });
 
 
+<<<<<<< HEAD
 app.get('/calendar/data', function(req, res){
     db.event.find().toArray(function(err, data){
         //set id property for all records
@@ -623,6 +628,12 @@ app.post('/calendar/data', function(req, res){
     else
         res.send("Not supported operation");
 });
+
+app.post('/checklist/noticeboard/messages', post_message_id);
+
+// app.get('*', function(req, res){
+//   res.status(404).render('404page');
+// });
 
 app.listen(PORT, function () {
     console.log('Listening on port ' + PORT);
