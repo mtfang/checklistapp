@@ -1,12 +1,16 @@
 <!doctype html>
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
-	<title>Basic initialization</title>
+	<title>Calendar</title>
 	<!-- <link rel="stylesheet" href="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.css"> -->
 	<link rel="stylesheet" href="/codebase/dhtmlxscheduler_material.css">
+	<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 	<!-- <script src="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.js"></script> -->
 	<script src="/codebase/dhtmlxscheduler.js"></script>
 	<script src="/codebase/ext/dhtmlxscheduler_limit.js"></script>
+	<script src="/codebase/ext/dhtmlxscheduler_all_timed.js"></script>
+	<script src="/codebase/ext/dhtmlxscheduler_minical.js"></script>
+	<script src="/codebase/ext/dhtmlxscheduler_agenda_view.js" ></script>
 <!-- 	<style>
 		html, body{
 			margin:0px;
@@ -23,14 +27,20 @@
 			height:100%;
 			overflow:hidden;
 		}
-
+		h1 { text-align: center }
+		h2 { text-align: center; word-spacing: 50px;}
 		.dhx_cal_event div.dhx_footer,
 		.dhx_cal_event.past_event div.dhx_footer,
 		.dhx_cal_event.event_plassys div.dhx_footer,
-		.dhx_cal_event.event_vhf div.dhx_footer,
+		.dhx_cal_event.event_uetch div.dhx_footer,
 		.dhx_cal_event.event_sem div.dhx_footer{
 			background-color: transparent !important;
 		}
+
+		.dhx_cal_light{
+		   width:476px;
+		}
+
 		.dhx_cal_event .dhx_body{
 			-webkit-transition: opacity 0.1s;
 			transition: opacity 0.1s;
@@ -46,30 +56,29 @@
 			opacity: 1;
 		}
 
-		.dhx_cal_event.event_vhf div,
-		.dhx_cal_event_line.event_vhf{
+
+
+		.dhx_cal_event.event_uetch div,
+		.dhx_cal_event_line.event_uetch{
 			background-color: #FF5722 !important;
 			border-color: #732d16 !important;
 		}
-
-		.dhx_cal_event.dhx_cal_editor.event_vhf{
+		.dhx_cal_event.dhx_cal_editor.event_uetch{
 			background-color: #FF5722 !important;
 		}
-
-		.dhx_cal_event_clear.event_vhf{
+		.dhx_cal_event_clear.event_uetch{
 			color:#FF5722 !important;
 		}
+
 
 		.dhx_cal_event.event_sem div,
 		.dhx_cal_event_line.event_sem{
 			background-color: #0FC4A7 !important;
 			border-color: #698490 !important;
 		}
-
 		.dhx_cal_event.dhx_cal_editor.event_sem{
 			background-color: #0FC4A7 !important;
 		}
-
 		.dhx_cal_event_clear.event_sem{
 			color:#0FC4A7 !important;
 		}
@@ -79,14 +88,67 @@
 			background-color: #684f8c !important;
 			border-color: #9575CD !important;
 		}
-
 		.dhx_cal_event.dhx_cal_editor.event_plassys{
 			background-color: #684f8c !important;
 		}
-
 		.dhx_cal_event_clear.event_plassys{
 			color:#B82594 !important;
 		}
+
+		.dhx_cal_event.event_ald div,
+		.dhx_cal_event_line.event_ald{
+			background-color: #dd1c1c !important;
+			border-color: #ff6666 !important;
+		}
+		.dhx_cal_event.dhx_cal_editor.event_ald{
+			background-color: #dd1c1c !important;
+		}
+		.dhx_cal_event_clear.event_ald{
+			color:#dd6a6a !important;
+		}
+
+		.dhx_cal_event.event_edwards div,
+		.dhx_cal_event_line.event_edwards{
+			background-color: #848484 !important;
+			border-color: #b7b7b7 !important;
+		}
+		.dhx_cal_event.dhx_cal_editor.event_edwards{
+			background-color: #848484 !important;
+		}
+		.dhx_cal_event_clear.event_edwards{
+			color:#c9c9c9 !important;
+		}
+
+		.dhx_cal_event_cont_selected{
+		background-color: #9cc1db;
+		color: white;
+	}
+	.dhx_scale_hour_main {
+		float: left;
+		text-align: right;
+		font-size: 16px;
+		font-weight: bold;
+	}
+	.dhx_scale_hour_minute_cont {
+		float: left;
+		position: relative;
+		text-align: right;
+	}
+	.dhx_scale_hour_minute_top, .dhx_scale_hour_minute_bottom {
+		font-size: 10px;
+		padding-right: 5px;
+	}
+	.dhx_scale_hour_sep {
+		position: absolute;
+		height: 1px;
+		background-color: #8C929A;
+		right: 0;
+		top: 20px;
+		width: 20px;
+	}
+	.dhx_lightbox_time_select{width:120px !important;}
+
+	.dhx_minical_icon{left:400px!important;top:12px!important}
 	</style>
 
 	<script>
@@ -98,17 +160,43 @@
 			var dnd = dn.getDay();
 			var dnh = dn.getHours();
 			var dnmn = dn.getMinutes();
+			scheduler.init('scheduler_here',new Date(dny,dnm,dnd+1),"week");
 
+			scheduler.config.container_autoresize = true;
 			scheduler.xy.scale_width = 70;
 			scheduler.config.time_step = 30;
+			scheduler.config.all_timed = true;
 			scheduler.config.multi_day = true;
+			scheduler.config.limit_time_select = true;
+
 			scheduler.config.mark_now = true;
 			scheduler.locale.labels.section_subject = "Tool";
 			scheduler.config.details_on_dblclick = true;
 			scheduler.config.details_on_create = true;
-			scheduler.config.xml_date="%Y-%m-%d %H:%i";
-			scheduler.config.hour_date="%h:%i %A";
+			scheduler.config.xml_date="%Y-%n-%j %g:%i";
+			scheduler.config.hour_date="%g:%i%a";
+
+			scheduler.locale.labels.agenda_tab="Agenda";
+
 			// scheduler.config.now_date = new Date(dny, dnm, dnd, dnh, dnmn);
+			scheduler.templates.hour_scale = function(date){
+            var hour = date.getHours();
+            var top = '00';
+            var bottom = '30';
+            if(hour==0)
+                top = 'AM';
+            if(hour==12)
+                top = 'PM';
+            hour =  ((date.getHours()+11)%12)+1;
+            var html = '';
+            var section_width = Math.floor(scheduler.xy.scale_width/2);
+            var minute_height = Math.floor(scheduler.config.hour_size_px/2);
+            html += "<div class='dhx_scale_hour_main' style='width: "+section_width+"px; height:"+(minute_height*2)+"px;'>"+hour+"</div><div class='dhx_scale_hour_minute_cont' style='width: "+section_width+"px;'>";
+            html += "<div class='dhx_scale_hour_minute_top' style='height:"+minute_height+"px; line-height:"+minute_height+"px;'>"+top+"</div><div class='dhx_scale_hour_minute_bottom' style='height:"+minute_height+"px; line-height:"+minute_height+"px;'>"+bottom+"</div>";
+            html += "<div class='dhx_scale_hour_sep'></div></div>";
+            return html;		
+			};
+
 
 			scheduler.templates.event_class=function(start, end, event){
 				var css = "";
@@ -120,23 +208,65 @@
 				return css; // default return
 			};
 			var tools = [
-				{ key: '', label: 'Select a tool' },
+				{ key: 'oxford', label: 'Oxford' },
 				{ key: 'plassys', label: 'Plassys' },
 				{ key: 'sem', label: 'SEM' },
-				{ key: 'vhf', label: 'uEtch' }
+				{ key: 'uetch', label: 'uEtch' },
+				{ key: 'ald', label: 'ALD' },
+				{ key: 'edwards', label: 'Edwards' }
 			];
-
 			scheduler.config.lightbox.sections=[
-				{name:"User", height:43, map_to:"text", type:"textarea" , focus:true},
-				{name:"Tools", height:20, type:"select", options: tools, map_to:"tools" },
-				{name:"time", height:72, type:"time", map_to:"auto" }
+				{name:"User", height:50, map_to:"text", type:"textarea" , focus:true, default_value: ""},
+				{name:"Tool", height:50, type:"select", options: tools, map_to:"tools" },
+				{name:"time", height:100, type:"time", map_to:"auto"}
 			];
 			scheduler.templates.lightbox_header = function(start, end, event){
-			return "Details for "+event.text;
+			if (typeof(event.tools) != "undefined") {
+				return "Details for "+event.tools + " reservation";
+			}
+			else {
+				return "Details for new reservation";
+			}
 			}
 
-			scheduler.init('scheduler_here',new Date(dny,dnm,dnd),"week");
-			// scheduler.init('scheduler_here',new Date(2018,8,5),"month");
+			scheduler.attachEvent("onEventSave",function(id,ev,is_new){
+			    if (!ev.text) {
+			        alert("User field must not be empty");
+			        return false;
+			    }
+			   if (ev.start_date > ev.end_date) {
+			   		alert("Starting time must proceed ending time");
+			        return false;
+			   }
+			    return true;
+			})
+			scheduler.is_one_day_event = function(){
+		    	if(scheduler.getState().mode == "week") 
+		    	    return true;
+			}
+
+			scheduler.attachEvent("onTemplatesReady", function(){
+    		scheduler.templates.event_text=function(start,end,event){if (typeof(event.tools) != "undefined") {
+    		    return event.tools.toUpperCase() + " - " + event.text;
+    		}}
+			}); 
+			scheduler.templates.event_bar_text = function(start,end,event){
+			    return event.tools.toUpperCase() + " - " + event.text;
+			};
+
+			scheduler.templates.agenda_text = function(start,end,event){
+			    return event.tools.toUpperCase() + " - " + event.text;
+			};
+
+			scheduler.attachEvent("onBeforeLightbox", function (id){
+			    var event = scheduler.getEvent(id);
+			    if (event.text == "New event") {
+			    	event.text = "";
+			    } 
+			    return true;
+			});
+
+			
 
 			scheduler.templates.xml_date = function(value){ return new Date(value); };
 			scheduler.load("/data", "json");
@@ -145,15 +275,37 @@
 			dp.init(scheduler);
 			dp.setTransactionMode("POST", false);
 		}
+		function show_minical(){
+		if (scheduler.isCalendarVisible())
+			scheduler.destroyCalendar();
+		else
+			scheduler.renderCalendar({
+				position:"dhx_minical_icon",
+				date:scheduler._date,
+				navigation:true,
+				handler:function(date,calendar){
+					scheduler.setCurrentView(date);
+					scheduler.destroyCalendar()
+				}
+			});
+		}
 	</script>
 </head>
 <body onload="init();">
+	<div class="w3-container w3-blue">
+  <h1><a href="http://friday.caltech.edu/checklist/">Painter Lab Reservation Calendar</a></h1>
+	</div>
+	<!-- <div class="w3-container w3-white"><h2> Colorkey: <font color= #0288D1> Oxford </font><font color= #684f8c> Plassys </font><font color=#0FC4A7> SEM </font><font color=#FF5722> uEtch </font></h2> </div> -->
 	<div id="scheduler_here" class="dhx_cal_container" style='width:100%; height:100%;'>
+
 		<div class="dhx_cal_navline">
 			<div class="dhx_cal_prev_button">&nbsp;</div>
 			<div class="dhx_cal_next_button">&nbsp;</div>
-			<div class="dhx_cal_today_button"></div>
+			<div class="dhx_cal_today_button"&nbsp;></div>
+			<div class="dhx_cal_tab" name="agenda_tab"></div>
 			<div class="dhx_cal_date"></div>
+			<div class="dhx_minical_icon" id="dhx_minical_icon" onclick="show_minical()" >&nbsp;</div>
+			
 			<div class="dhx_cal_tab" name="day_tab"></div>
 			<div class="dhx_cal_tab" name="week_tab"></div>
 			<div class="dhx_cal_tab" name="month_tab" ></div>

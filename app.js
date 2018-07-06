@@ -8,7 +8,7 @@ const path = require("path");
 //require the underscore nodejs module
 var _und = require('underscore');
 //define port number
-const PORT = 3000; //process.env.PORT || 80;
+const PORT = process.env.PORT || 80;
 //require filesystem
 const fs = require('fs');
 //require readline
