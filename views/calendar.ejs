@@ -153,32 +153,10 @@
 
 	<script>
 		function init() {
-			var datenow = Date.now();
-			var dn = new Date(datenow);
-			var dny = dn.getYear() + 1900;
-			var dnm = dn.getMonth();
-			var dnd = dn.getDay();
-			var dnh = dn.getHours();
-			var dnmn = dn.getMinutes();
-			scheduler.init('scheduler_here',new Date(dny,dnm,dnd+1),"week");
 
-			scheduler.config.container_autoresize = true;
-			scheduler.xy.scale_width = 70;
-			scheduler.config.time_step = 30;
-			scheduler.config.all_timed = true;
-			scheduler.config.multi_day = true;
-			scheduler.config.limit_time_select = true;
-
-			scheduler.config.mark_now = true;
-			scheduler.locale.labels.section_subject = "Tool";
-			scheduler.config.details_on_dblclick = true;
-			scheduler.config.details_on_create = true;
 			scheduler.config.xml_date="%Y-%n-%j %g:%i";
 			scheduler.config.hour_date="%g:%i%a";
 
-			scheduler.locale.labels.agenda_tab="Agenda";
-
-			// scheduler.config.now_date = new Date(dny, dnm, dnd, dnh, dnmn);
 			scheduler.templates.hour_scale = function(date){
             var hour = date.getHours();
             var top = '00';
@@ -197,6 +175,65 @@
             return html;		
 			};
 
+			var datenow = Date.now();
+			var dn = new Date(datenow);
+			var dny = dn.getYear() + 1900;
+			var dnm = dn.getMonth();
+			var dnd = dn.getDay() + 1;
+			var dnh = dn.getHours();
+			var dnmn = dn.getMinutes();
+			scheduler.init('scheduler_here',new Date(dny,dnm,dnd),"week");
+
+			scheduler.config.container_autoresize = true;
+			scheduler.xy.scale_width = 70;
+			scheduler.config.time_step = 30;
+			scheduler.config.all_timed = true;
+			scheduler.config.multi_day = true;
+			scheduler.config.limit_time_select = true;
+
+			scheduler.config.mark_now = true;
+			scheduler.locale.labels.section_subject = "Tool";
+			scheduler.config.details_on_dblclick = true;
+			scheduler.config.details_on_create = true;
+			
+
+			scheduler.locale.labels.agenda_tab="Agenda";
+
+			scheduler.attachEvent("onEventSave",function(id,ev,is_new){
+			    if (!ev.text) {
+			        alert("User field must not be empty");
+			        return false;
+			    }
+			   if (ev.start_date > ev.end_date) {
+			   		alert("Starting time must proceed ending time");
+			        return false;
+			   }
+			    return true;
+			})
+			scheduler.is_one_day_event = function(){
+		    	if(scheduler.getState().mode == "week") 
+		    	    return true;
+			}
+
+    		scheduler.templates.event_text=function(start,end,event){
+    			if (typeof(event.tools) != "undefined") {
+    		    return event.tools.toUpperCase() + " - " + event.text;
+    		}};
+			scheduler.templates.event_bar_text = function(start,end,event){
+			    return event.tools.toUpperCase() + " - " + event.text;
+			};
+
+			scheduler.templates.agenda_text = function(start,end,event){
+			    return event.tools.toUpperCase() + " - " + event.text;
+			};
+
+			scheduler.attachEvent("onBeforeLightbox", function (id){
+			    var event = scheduler.getEvent(id);
+			    if (event.text == "New event") {
+			    	event.text = "";
+			    } 
+			    return true;
+			});
 
 			scheduler.templates.event_class=function(start, end, event){
 				var css = "";
@@ -220,6 +257,9 @@
 				{name:"Tool", height:50, type:"select", options: tools, map_to:"tools" },
 				{name:"time", height:100, type:"time", map_to:"auto"}
 			];
+
+			scheduler.config.agenda_start = new Date(dny, dnm, dnd);
+
 			scheduler.templates.lightbox_header = function(start, end, event){
 			if (typeof(event.tools) != "undefined") {
 				return "Details for "+event.tools + " reservation";
@@ -229,52 +269,16 @@
 			}
 			}
 
-			scheduler.attachEvent("onEventSave",function(id,ev,is_new){
-			    if (!ev.text) {
-			        alert("User field must not be empty");
-			        return false;
-			    }
-			   if (ev.start_date > ev.end_date) {
-			   		alert("Starting time must proceed ending time");
-			        return false;
-			   }
-			    return true;
-			})
-			scheduler.is_one_day_event = function(){
-		    	if(scheduler.getState().mode == "week") 
-		    	    return true;
-			}
-
-			scheduler.attachEvent("onTemplatesReady", function(){
-    		scheduler.templates.event_text=function(start,end,event){if (typeof(event.tools) != "undefined") {
-    		    return event.tools.toUpperCase() + " - " + event.text;
-    		}}
-			}); 
-			scheduler.templates.event_bar_text = function(start,end,event){
-			    return event.tools.toUpperCase() + " - " + event.text;
-			};
-
-			scheduler.templates.agenda_text = function(start,end,event){
-			    return event.tools.toUpperCase() + " - " + event.text;
-			};
-
-			scheduler.attachEvent("onBeforeLightbox", function (id){
-			    var event = scheduler.getEvent(id);
-			    if (event.text == "New event") {
-			    	event.text = "";
-			    } 
-			    return true;
-			});
-
-			
-
 			scheduler.templates.xml_date = function(value){ return new Date(value); };
 			scheduler.load("/data", "json");
 
 			var dp = new dataProcessor("/data");
 			dp.init(scheduler);
 			dp.setTransactionMode("POST", false);
+
 		}
+
+
 		function show_minical(){
 		if (scheduler.isCalendarVisible())
 			scheduler.destroyCalendar();
