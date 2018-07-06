@@ -56,6 +56,16 @@
                 });
             }
 
+            function update_message(updateid) {
+                $.ajax({
+                    url: "/checklist/noticeboard/messages/" + updateid,
+                    dataType: "json",
+                    success: function (data) {
+                        get_messages();
+                    }
+                });
+            }
+
             function update_message_list(message_data) {
                 $("#message_list").html("");
                 message_data.reverse();

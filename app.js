@@ -8,7 +8,7 @@ const path = require("path");
 //require the underscore nodejs module
 var _und = require('underscore');
 //define port number
-const PORT = process.env.PORT || 80;
+const PORT = 3000; //process.env.PORT || 80;
 //require filesystem
 const fs = require('fs');
 //require readline
@@ -22,14 +22,7 @@ const googleAuth = require('google-auth-library');
 //MongoDB
 var db = require('mongoskin').db("mongodb://michael:fang@painterchecklist-shard-00-00-ggi7h.gcp.mongodb.net:27017,painterchecklist-shard-00-01-ggi7h.gcp.mongodb.net:27017,painterchecklist-shard-00-02-ggi7h.gcp.mongodb.net:27017/test?ssl=true&replicaSet=PainterChecklist-shard-0&authSource=admin&retryWrites=true", { w: 0});
     db.bind('event2');
-
-// var allowCrossDomain = function(req, res, next) {
-//     res.header('Access-Control-Allow-Origin', '*');
-//     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE');
-//     res.header('Access-Control-Allow-Headers', 'Content-Type');
-
-//     next();
-// }
+    db.bind('notices');
 
 // If modifying these scopes, delete your previously saved credentials
 // at <$USERHOME>/.credentials/cleanroom_checklist_tokens.json
@@ -109,53 +102,37 @@ function getNewToken(oauth2Client, callback, sheetInfo, data) {
 /////////////////////////////////////////////////////////////////////////////////// HELPER FUNCTIONS
 var cdate = Date.now();
 
-var messages_id = [];
-
-function get_json_by_id(json_data, idnum) {
-  var filtered = json_data.filter(function(item) { 
-   return item.id == idnum;  
-  });
-}
 
 function get_message_list_id(req, res) {
-  res.json(messages_id);
+  db.notices.find().toArray(function(err, data){
+        //set id property for all records
+        for (var i = 0; i < data.length; i++)
+            data[i].id = data[i]._id;
+        //output response
+        res.send(data);
+    });
 }
 
-function get_message_id(req, res) {
-  var filtered = messages_id.filter(function(item) { 
-   return item.id == req.params.id;  
-  });
-  res.json(filtered);
-}
 
 function delete_message_id(req, res) {
-  console.log("deleting id " + req.params.id)
-  var filtered = messages_id.filter(function(item) { 
-   return (req.params.id - item.id) !== 0;  
-  });
-  
-  messages_id = filtered;
+  db.notices.removeById(req.params.id, function(err, res) {
+    if (err) throw err;
+    console.log("message " + req.params.id + " deleted");
+    db.notices.close();
+    });
   get_message_list_id(req, res);
 }
 
-function put_message_id(req, res) {
-  // if((messages.length <= req.params.id || req.params.id < 0) &&
-  //     (!req.body.hasOwnProperty('text'))) {
-  //   res.statusCode = 400;
-  //   return res.json({ error: 'Invalid message' });
-  // }  
-
-  messages_id[req.params.id] = { text: req.body.text};
+function post_message_id(req, res) { 
+  var data = {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr}}
+  db.notices.insert(data, function(err, res) {
+    if (err) throw err;
+    console.log("message inserted into database");
+    db.notices.close();
+    });
   get_message_list_id(req, res);
 }
-function post_message_id(req, res) {
-  // if(!req.body.hasOwnProperty('text')) {
-  //   res.statusCode = 400;
-  //   return res.json({ error: 'Invalid message' });
-  // }  
-  messages_id.push( {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr}});
-  get_message_list_id(req, res);
-}
+    
 
 function arraysEqual(a, b) {
     if (a === b) return true;
@@ -179,7 +156,15 @@ function loadSheetInfo(content){
     return [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage]
 }
 
-
+function db_messages(req, res) {
+    var messages_id = [];
+    db.notices.find().toArray(function(err, data){
+          //set id property for all records
+          for (var i = 0; i < data.length; i++)
+              data[i].id = data[i]._id;
+          updateSubmitDate(res, req, data)
+      });
+}
 
 function saveSheetInfo(sheetInfo){
     var data = {
@@ -200,21 +185,13 @@ function saveSheetInfo(sheetInfo){
     }); //writeFile
 }
 
-
 // STEP 0
-function updateSubmitDate(res, req){
+function updateSubmitDate(res, req, messages_id){
     fs.readFile(path.join(__dirname, 'config/sheets_info.json'), function processClientSecrets(err, sheetcontent) {
         if (err) {
             console.log('Error loading sheets info file: ' + err);
             return;
         } else {
-            // console.log('Sheet info read');
-            // var lastSubmit = loadSheetInfo(sheetcontent)[0];
-            // var spreadsheetId = loadSheetInfo(sheetcontent)[1];
-            // var sheetName = loadSheetInfo(sheetcontent)[2];
-            // var sheetLabels = loadSheetInfo(sheetcontent)[3];
-            // var lastUser = loadSheetInfo(sheetcontent)[4];
-            // var publicMessage = loadSheetInfo(sheetcontent)[5];
             [lastSubmit, spreadsheetId, sheetName, sheetLabels, lastUser, publicMessage] = loadSheetInfo(sheetcontent);
             // console.log(publicMessage)
             var date = new Date(lastSubmit)
@@ -234,7 +211,6 @@ function updateSubmitDate(res, req){
                 timeZone: 'America/Los_Angeles',
                 hour12: 'true'
             };
-            //}
             var date_now = new Date(Date.now());
             res.render('index', {
                 title: 'Last submitted by ' + lastUser + ' on',
@@ -248,6 +224,7 @@ function updateSubmitDate(res, req){
             }); //render
         }
     });
+    
 }
 
 // STEP 1
@@ -532,7 +509,7 @@ app.get('/', function (req, res) {
     res.redirect('/checklist');
 });
 app.get('/checklist', function (req, res) {
-    updateSubmitDate(res, req);
+    db_messages(req, res);
 });
 
 // Redirect Page
@@ -549,6 +526,7 @@ app.get('/checklist/help', function (req, res) {
 app.get('/checklist/calendar', function (req, res) {
     res.render('calendar'); //render
 });
+
 
 
 app.get('/data', function(req, res){
@@ -598,27 +576,15 @@ app.post('/data', function(req, res){
 app.post('/checklist/submission', function(req, res){
     console.log('Recieved online submission at ' + (new Date()));
         readSheetsInfo(req);
-        updateSubmitDate(res, req);
+        db_messages(req, res);
 });
 
 // Notice Board Page
 app.get('/checklist/noticeboard', function (req, res) {
-    get_message_list_id
     res.render('messages'); //render
 });
 app.get('/checklist/noticeboard/messages', get_message_list_id);
 app.get('/checklist/noticeboard/delete/:id', delete_message_id);
-app.get('/checklist/noticeboard/messages/:id', get_message_id);
-app.put('/checklist/noticeboard/messages/:id', put_message_id);
-
-
-// POST request
-app.post('/checklist/submission', function(req, res){
-    console.log('Recieved online submission at ' + (new Date()));
-        readSheetsInfo(req);
-        updateSubmitDate(res, req);
-});
-
 
 
 app.post('/checklist/noticeboard/messages', post_message_id);
