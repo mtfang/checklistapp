@@ -2,16 +2,93 @@
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8">
 	<title>Basic initialization</title>
-	<link rel="stylesheet" href="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.css">
-	<script src="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.js"></script>
-	<style>
+	<!-- <link rel="stylesheet" href="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.css"> -->
+	<link rel="stylesheet" href="/codebase/dhtmlxscheduler_material.css">
+	<!-- <script src="https://cdn.dhtmlx.com/scheduler/edge/dhtmlxscheduler.js"></script> -->
+	<script src="/codebase/dhtmlxscheduler.js"></script>
+	<script src="/codebase/ext/dhtmlxscheduler_limit.js"></script>
+<!-- 	<style>
 		html, body{
 			margin:0px;
 			padding:0px;
 			height:100%;
 			overflow:hidden;
 		}
+	</style> -->
+
+	<style type="text/css" >
+		html, body{
+			margin:0;
+			padding:0;
+			height:100%;
+			overflow:hidden;
+		}
+
+		.dhx_cal_event div.dhx_footer,
+		.dhx_cal_event.past_event div.dhx_footer,
+		.dhx_cal_event.event_plassys div.dhx_footer,
+		.dhx_cal_event.event_vhf div.dhx_footer,
+		.dhx_cal_event.event_sem div.dhx_footer{
+			background-color: transparent !important;
+		}
+		.dhx_cal_event .dhx_body{
+			-webkit-transition: opacity 0.1s;
+			transition: opacity 0.1s;
+			opacity: 0.7;
+		}
+		.dhx_cal_event .dhx_title{
+			line-height: 12px;
+		}
+		.dhx_cal_event_line:hover,
+		.dhx_cal_event:hover .dhx_body,
+		.dhx_cal_event.selected .dhx_body,
+		.dhx_cal_event.dhx_cal_select_menu .dhx_body{
+			opacity: 1;
+		}
+
+		.dhx_cal_event.event_vhf div,
+		.dhx_cal_event_line.event_vhf{
+			background-color: #FF5722 !important;
+			border-color: #732d16 !important;
+		}
+
+		.dhx_cal_event.dhx_cal_editor.event_vhf{
+			background-color: #FF5722 !important;
+		}
+
+		.dhx_cal_event_clear.event_vhf{
+			color:#FF5722 !important;
+		}
+
+		.dhx_cal_event.event_sem div,
+		.dhx_cal_event_line.event_sem{
+			background-color: #0FC4A7 !important;
+			border-color: #698490 !important;
+		}
+
+		.dhx_cal_event.dhx_cal_editor.event_sem{
+			background-color: #0FC4A7 !important;
+		}
+
+		.dhx_cal_event_clear.event_sem{
+			color:#0FC4A7 !important;
+		}
+
+		.dhx_cal_event.event_plassys div,
+		.dhx_cal_event_line.event_plassys{
+			background-color: #684f8c !important;
+			border-color: #9575CD !important;
+		}
+
+		.dhx_cal_event.dhx_cal_editor.event_plassys{
+			background-color: #684f8c !important;
+		}
+
+		.dhx_cal_event_clear.event_plassys{
+			color:#B82594 !important;
+		}
 	</style>
+
 	<script>
 		function init() {
 			var datenow = Date.now();
@@ -19,8 +96,45 @@
 			var dny = dn.getYear() + 1900;
 			var dnm = dn.getMonth();
 			var dnd = dn.getDay();
+			var dnh = dn.getHours();
+			var dnmn = dn.getMinutes();
 
+			scheduler.xy.scale_width = 70;
+			scheduler.config.time_step = 30;
+			scheduler.config.multi_day = true;
+			scheduler.config.mark_now = true;
+			scheduler.locale.labels.section_subject = "Tool";
+			scheduler.config.details_on_dblclick = true;
+			scheduler.config.details_on_create = true;
 			scheduler.config.xml_date="%Y-%m-%d %H:%i";
+			scheduler.config.hour_date="%h:%i %A";
+			// scheduler.config.now_date = new Date(dny, dnm, dnd, dnh, dnmn);
+
+			scheduler.templates.event_class=function(start, end, event){
+				var css = "";
+				if(event.tools) // if event has subject property then special class should be assigned
+					css += "event_"+event.tools;
+				if(event.id == scheduler.getState().select_id){
+					css += " selected";
+				}
+				return css; // default return
+			};
+			var tools = [
+				{ key: '', label: 'Select a tool' },
+				{ key: 'plassys', label: 'Plassys' },
+				{ key: 'sem', label: 'SEM' },
+				{ key: 'vhf', label: 'uEtch' }
+			];
+
+			scheduler.config.lightbox.sections=[
+				{name:"User", height:43, map_to:"text", type:"textarea" , focus:true},
+				{name:"Tools", height:20, type:"select", options: tools, map_to:"tools" },
+				{name:"time", height:72, type:"time", map_to:"auto" }
+			];
+			scheduler.templates.lightbox_header = function(start, end, event){
+			return "Details for "+event.text;
+			}
+
 			scheduler.init('scheduler_here',new Date(dny,dnm,dnd),"week");
 			// scheduler.init('scheduler_here',new Date(2018,8,5),"month");
 
