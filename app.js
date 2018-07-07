@@ -8,7 +8,7 @@ const path = require("path");
 //require the underscore nodejs module
 var _und = require('underscore');
 //define port number
-const PORT = 3000; //process.env.PORT || 80;
+const PORT = process.env.PORT || 80;
 //require filesystem
 const fs = require('fs');
 //require readline
@@ -124,7 +124,7 @@ function delete_message_id(req, res) {
 }
 
 function post_message_id(req, res) { 
-  var data = {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr}}
+  var data = {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr, showOnHome: req.body.show}}
   db.notices.insert(data, function(err, res) {
     if (err) throw err;
     console.log("message inserted into database");

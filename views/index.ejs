@@ -1,11 +1,14 @@
 <% include partials/header %>
-<%if (noticeboard.length > 0) {%>
+<% if (noticeboard.length > 0) {%>
+<% for(var i = 0; i <= noticeboard.length - 1; i++) {%>
+<% var tempNotice = noticeboard[i]; %>
+    <% if (tempNotice.content.showOnHome == "true") {%>
     <div class="alert alert-danger">
-      <% var last_message = noticeboard[noticeboard.length - 1]; %>
-        <h2>Latest Notice: "<%= last_message.content.text %>" - <%= last_message.content.author %></h2>
+        <h2>"<%= tempNotice.content.text %>" - <%= tempNotice.content.author %></h2>
     </div>
-<% } %>
-
+    <%}%>
+<%}%>
+<%}%>
 <%if (message != "" && message != null) {%>
     <div class="alert alert-danger">
         <h2>Checklist Notice: "<%= message %>" - <%= user %></h2>

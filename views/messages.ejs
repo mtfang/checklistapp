@@ -7,7 +7,12 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
         <link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+        <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
         <script>
+
+            var showOnHome = false;
+
             $(function() {
                 $("#post_button").click(function() {
                     clickDate = Date.now();
@@ -16,10 +21,15 @@
                 get_messages();
             });
             
+            
+            // $(document).on('click', '.delete_button', function(){
+            //     delete_message(this.id);
+            // });
 
-            $(document).on('click', '.delete_button', function(){
+             $(document).on('click', ':submit', function(){
                 delete_message(this.id);
             });
+
 
             function get_messages() {
                 $.ajax({
@@ -39,7 +49,7 @@
                     url: "/checklist/noticeboard/messages",
                     type: "POST",
                     dataType: "json",
-                    data: { "id": curdate, "text": new_message , "author": new_author, "dateStr": Date(curdate)},
+                    data: { "id": curdate, "text": new_message , "author": new_author, "dateStr": Date(curdate), "show": showOnHome},
                     success: function (data) {
                         get_messages();
                     }
@@ -70,17 +80,21 @@
                 $("#message_list").html("");
                 message_data.reverse();
                 $.each(message_data, function(index, value) {
-                    $("#message_list").append("<div class=\"container\" id = \"message_container\"><div class=\"h3\">\"" + value.content.text + "\" - " + value.content.author + "</div><br><div class=\"h4\">" + "<button class=\"delete_button\" class = \".btn-block\" name=\"delete_button\" id=" + value.id + ">Delete</button>" + "&emsp;"+ value.content.dateStr + "</div></div>" + "<br>");
+                    $("#message_list").append("<div class=\"container\" id = \"message_container\"><div class=\"h3\">\"" + value.content.text + "\" - " + value.content.author + "</div><br><div class=\"h4\">" + "<button class=\"btn btn-danger\"  name=\"delete_button\" type=\"submit\" id=" + value.id + ">Delete</button>" + "&emsp;"+ value.content.dateStr + "</div></div>" + "<br>");
                 });
             }
-            function GoBackWithRefresh(event) {
-                if ('referrer' in document) {
-                    window.location = document.referrer;
-                } else {
+            function GoBack(event) {
                     window.history.back();
                 }
-            }
+
         </script>
+    <style type="text/css" >
+        .btn-primary {
+        color: #fff !important;
+        background-color: #007bff !important;
+        border-color: #007bff !important;
+        }
+    </style>
     </head>
     <body>
         
@@ -92,8 +106,20 @@
     <input type="text" name="post_message" id="post_message" size= 80 /> <br>
     <h3><strong><u>Author:</u></strong></h3>
     <input type="text" name="post_author" id="post_author" size= 10/>
-    <br><br>
-    <input type="button" name="post_button" id="post_button" value="Post" /> <input type="button" onclick="GoBackWithRefresh()" value="Go Back" />
+    <br>
+    <br>
+    <input type="checkbox" id="toggledoggle" data-toggle="toggle" data-on="Show On Home" data-off="Hide From Home" data-onstyle="success" data-offstyle="danger">
+    <div id="console-event"></div>
+    <script>
+      $(function() {
+        $('#toggledoggle').change(function() {
+          showOnHome = $(this).prop('checked');
+        })
+      })
+    </script>
+    <br>
+    <button type="button" class="btn btn-success" name="post_button" id="post_button">Post </button>
+    <button type="button" class="btn btn-primary" onclick="GoBack()">Go Back</button>
     </div> 
     </div> 
     <div class="container"><div class="jumbotron" id="message_jumbo">
