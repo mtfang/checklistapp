@@ -117,7 +117,7 @@ function get_message_list_id(req, res) {
 function delete_message_id(req, res) {
   db.notices.removeById(req.params.id, function(err, res) {
     if (err) throw err;
-    console.log("message " + req.params.id + " deleted");
+    // console.log("message " + req.params.id + " deleted");
     db.notices.close();
     });
   get_message_list_id(req, res);
@@ -127,12 +127,37 @@ function post_message_id(req, res) {
   var data = {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr, showOnHome: req.body.show}}
   db.notices.insert(data, function(err, res) {
     if (err) throw err;
-    console.log("message inserted into database");
+    // console.log("message inserted into database");
     db.notices.close();
     });
   get_message_list_id(req, res);
 }
-    
+
+function getIdPromise(req){
+    return new Promise(function(resolve, reject) {
+            db.notices.findById(req.params.id, function(err, data) {
+              if (err) {
+                reject(err);
+              } else {
+                for (var i = 0; i < data.length; i++) data[i].id = data[i]._id;
+                resolve(data);
+              }
+            });
+        })
+}
+
+
+function edit_post_message_id(req, res) { 
+    // console.log("updating " + req.body.id)
+    var data = {id: req.body.id, content: { text: req.body.text , author: req.body.author , dateStr: req.body.dateStr, showOnHome: req.body.show}}
+    db.notices.updateById(req.body.id, data, function(err, result) {
+        if (err) throw err;
+        db.notices.close();
+        // console.log("updated " + req.body.id + " in database");
+    });
+    // get_message_list_id(req, res);
+    res.render('messages'); //render
+}    
 
 function arraysEqual(a, b) {
     if (a === b) return true;
@@ -585,8 +610,19 @@ app.get('/checklist/noticeboard', function (req, res) {
 });
 app.get('/checklist/noticeboard/messages', get_message_list_id);
 app.get('/checklist/noticeboard/delete/:id', delete_message_id);
-
-
+app.get('/checklist/noticeboard/edit/:id',  function (req, res) {
+    // edit_get_message_id(req, res)
+    getIdPromise(req).then(function (data) {
+        res.render('edit', {
+              old_id: data.id, 
+              old_text: data.content.text,
+              old_author: data.content.author,
+              old_dateStr: data.content.dateStr,
+              old_showOnHome: data.content.showOnHome
+          });
+    })
+});
+app.post('/checklist/noticeboard/edit', edit_post_message_id);
 app.post('/checklist/noticeboard/messages', post_message_id);
 
 

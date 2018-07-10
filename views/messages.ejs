@@ -2,13 +2,13 @@
 <html>
     <head>
         <title>Notice Board</title>
-        
-        <!-- <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" /> -->
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta/css/bootstrap.min.css" integrity="sha384-/Y6pD6FV/Vv2HJnA6t+vslU6fwYXjCFtcEpHbNJ0lyAFsXTsjBbfaDjzALeQsN6M" crossorigin="anonymous">
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <link rel="stylesheet" type="text/css" href="/stylesheets/main.css" />
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
         <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
         <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
         <script>
 
             var showOnHome = false;
@@ -21,15 +21,16 @@
                 get_messages();
             });
             
-            
-            // $(document).on('click', '.delete_button', function(){
-            //     delete_message(this.id);
-            // });
-
-             $(document).on('click', ':submit', function(){
+            $(document).on('click', '.btn.btn-danger', function(){
                 delete_message(this.id);
             });
 
+            $(document).on('click', '.btn.btn-primary', function(){
+                // alert("clicked")
+                // edit_message(this.id);
+                window.location=" /checklist/noticeboard/edit/" + this.id
+
+            });
 
             function get_messages() {
                 $.ajax({
@@ -65,6 +66,15 @@
                     }
                 });
             }
+            function edit_message(editid) {
+                $.ajax({
+                    url: " /checklist/noticeboard/edit/" + editid,
+                    dataType: "json",
+                    success: function (data) {
+                        
+                    }
+                });
+            }
 
             function update_message(updateid) {
                 $.ajax({
@@ -80,12 +90,30 @@
                 $("#message_list").html("");
                 message_data.reverse();
                 $.each(message_data, function(index, value) {
-                    $("#message_list").append("<div class=\"container\" id = \"message_container\"><div class=\"h3\">\"" + value.content.text + "\" - " + value.content.author + "</div><br><div class=\"h4\">" + "<button class=\"btn btn-danger\"  name=\"delete_button\" type=\"submit\" id=" + value.id + ">Delete</button>" + "&emsp;"+ value.content.dateStr + "</div></div>" + "<br>");
+                    $("#message_list").append("<div class=\"container\" id = \"message_container\"><div class=\"h3\">" + hiddenicon(value.content.showOnHome) +"<i>" + value.content.text + "</i> - " + value.content.author + "</div><br><div class=\"h5\">" + shortDate(value.content.dateStr) +"</div> <div align=\"right\">  <button class=\"btn btn-primary\"  name=\"edit_button\" type=\"image\" id=" + value.id + ">Edit</button>" + "&emsp;"+ "<button class=\"btn btn-danger\"  name=\"delete_button\" type=\"submit\" id=" + value.id + ">Delete</button></div>" + "&emsp; </div><br></div>" + "<br>");   
                 });
             }
-            function GoBack(event) {
-                    window.history.back();
+
+            function shortDate(dateString){
+                var options1 = {hour: '2-digit', minute:'2-digit'};
+                var options2 = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'};
+                var datee = new Date(Date.parse(dateString));
+                return datee.toLocaleTimeString('en-US', options1) +  " - " + datee.toLocaleDateString('en-US', options2)
+            }
+
+            function hiddenicon(boolean){
+                if (boolean == "true") {
+                    return "<i class=\"fa fa-eye\" style=\"font-size:48px;color:green\"></i> &emsp;"
                 }
+                else if (boolean == "false") {
+                    return "<i class=\"fa fa-eye-slash\" style=\"font-size:48px;color:red\"></i> &emsp;"
+                }
+            }
+
+            function GoBack(event) {
+                window.location.replace("http://friday.caltech.edu/checklist");
+            }
+
 
         </script>
     <style type="text/css" >
@@ -93,6 +121,12 @@
         color: #fff !important;
         background-color: #007bff !important;
         border-color: #007bff !important;
+        }
+        .input {
+            width: 100%;
+            display: block;
+                overflow: hidden;
+                padding-right:10px;
         }
     </style>
     </head>
@@ -102,13 +136,12 @@
         <br>
     <div class="container" id = "top_container" align = "center"><div class="jumbotron" id="message_top_jumbo">
     <br>
-    <h3><strong><u>Message:</u></strong></h3>
-    <input type="text" name="post_message" id="post_message" size= 80 /> <br>
-    <h3><strong><u>Author:</u></strong></h3>
-    <input type="text" name="post_author" id="post_author" size= 10/>
+    <div class="container" align ="center">
+    <h3><strong>Message: &emsp;</strong> <input type="text" name="post_message" id="post_message" /> </h3>
+     <br>
+    <h3><strong>Author:&emsp; </strong> <input type="text" name="post_author" id="post_author"/></h3>
     <br>
-    <br>
-    <input type="checkbox" id="toggledoggle" data-toggle="toggle" data-on="Show On Home" data-off="Hide From Home" data-onstyle="success" data-offstyle="danger">
+    <h3><strong>Display:&emsp; </strong><input type="checkbox" id="toggledoggle" data-toggle="toggle" data-on="Show On Home" data-off="Hide From Home" data-onstyle="success" data-offstyle="danger"></h3>
     <div id="console-event"></div>
     <script>
       $(function() {
@@ -118,8 +151,10 @@
       })
     </script>
     <br>
-    <button type="button" class="btn btn-success" name="post_button" id="post_button">Post </button>
-    <button type="button" class="btn btn-primary" onclick="GoBack()">Go Back</button>
+</div>
+    <br>
+    <button type="button" class="btn btn-success" name="post_button" id="post_button">Post</button>
+    <button type="button" class="btn btn-secondary" onclick="GoBack()">Go Back</button>
     </div> 
     </div> 
     <div class="container"><div class="jumbotron" id="message_jumbo">

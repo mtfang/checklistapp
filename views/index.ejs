@@ -1,13 +1,16 @@
 <% include partials/header %>
 <% if (noticeboard.length > 0) {%>
+<div class="alert alert-danger">
 <% for(var i = 0; i <= noticeboard.length - 1; i++) {%>
 <% var tempNotice = noticeboard[i]; %>
     <% if (tempNotice.content.showOnHome == "true") {%>
-    <div class="alert alert-danger">
-        <h2>"<%= tempNotice.content.text %>" - <%= tempNotice.content.author %></h2>
-    </div>
+    <% if (i != 0) {%>
+      <br>
+    <%}%>
+        <h3><i><%= tempNotice.content.text %></i> - <%= tempNotice.content.author %></h3>
     <%}%>
 <%}%>
+</div>
 <%}%>
 <%if (message != "" && message != null) {%>
     <div class="alert alert-danger">

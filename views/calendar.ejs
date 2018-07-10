@@ -154,6 +154,8 @@
 	<script>
 		function init() {
 
+			
+
 			scheduler.config.xml_date="%Y-%n-%j %g:%i";
 			scheduler.config.hour_date="%g:%i%a";
 
@@ -179,7 +181,7 @@
 			var dn = new Date(datenow);
 			var dny = dn.getYear() + 1900;
 			var dnm = dn.getMonth();
-			var dnd = dn.getDay() + 1;
+			var dnd = dn.getDate();
 			var dnh = dn.getHours();
 			var dnmn = dn.getMinutes();
 			scheduler.init('scheduler_here',new Date(dny,dnm,dnd),"week");
@@ -275,6 +277,8 @@
 			var dp = new dataProcessor("/data");
 			dp.init(scheduler);
 			dp.setTransactionMode("POST", false);
+
+
 
 		}
 
